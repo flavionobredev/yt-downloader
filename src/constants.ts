@@ -1,0 +1,3 @@
+// query url: https://youyube.playlist...
+export const GET_PLAYLIST_INFO =
+  "https://ddownr.com/api/info/checkPlaylist.php";
