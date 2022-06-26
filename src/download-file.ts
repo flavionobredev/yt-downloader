@@ -21,18 +21,14 @@ export class DownloadFile extends EventEmitter {
     const filename = DownloaderUtil.getFilenameByHeader(
       stream.headers["content-disposition"]
     );
-    console.log(stream.headers);
     let downloaded = 0;
     stream.data.pipe(createWriteStream(`${this.destination}/${filename}`));
     stream.data.on("data", (chunk: string) => {
       downloaded = downloaded + chunk.length;
-      // console.log(`percent: ${chunk.length/Number(stream.headers["content-length"])}`);
-      console.log(
-        `percent: ${downloaded / Number(stream.headers["content-length"])}`
-      );
+      this.emit("progress", downloaded / Number(stream.headers["content-length"]));
     });
     stream.data.on("end", () => {
-      console.log(`download from "${filename}" has completed`);
+      this.emit('finished')
     });
   }
 }

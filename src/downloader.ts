@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync } from "fs";
-import { DownloadFile } from "./download-file";
-import { Job } from "./job";
+import { VideoToMp3Job } from "./job";
+import { Manager } from "./manager";
 import { ExternalAPI } from "./util";
 
 type Options = {
@@ -10,17 +10,18 @@ type Options = {
 export class Downloader {
   private destination: string;
   private playlistUrl: string;
-  private downloadFile: DownloadFile;
   private options: Options;
 
-  private jobs = new Map<string, Job>()
+  private manager: Manager;
 
   constructor(playlistUrl: string, dest: string, options: Options) {
     this.destination = dest;
     this.playlistUrl = playlistUrl;
     this.options = options;
     this.createDestinationFolder();
-    this.downloadFile = new DownloadFile(this.destination);
+    this.manager = new Manager({
+      maxConcurrency: this.options.maxConcurrency,
+    });
   }
 
   private createDestinationFolder(): void {
@@ -38,10 +39,24 @@ export class Downloader {
       );
     }
 
-    const videos = playlistInfo.videos;
+    const videos = playlistInfo.videos as string[];
+    videos.slice(0, 3).forEach((video) =>
+      this.manager.addJob(
+        video,
+        new VideoToMp3Job({
+          url: video,
+          destination: this.destination,
+        })
+      )
+    );
 
-    // this.downloadFile.download(videos[0]);
-
-    // console.log(videos);
+    this.manager.start();
+    const logInterval = setInterval(() => {
+      if (this.manager.activeJobs.length === 0) {
+        clearInterval(logInterval);
+      }
+      console.clear()
+      this.manager.logStatus();
+    }, 1000);
   }
 }
