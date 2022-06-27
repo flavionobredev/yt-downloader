@@ -7,7 +7,7 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "start:one": "npx ts-node src/index.ts"
+    "start": "npx ts-node src/index.ts"
   },
   "keywords": [],
   "author": "",
