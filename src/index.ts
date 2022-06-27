@@ -1,9 +1,6 @@
 import { join } from "path";
 import { Downloader } from "./downloader";
 
-const link =
-  "https://melinda1.oceansaver.in/pacific/?OLfI4cIJ9QeQl3bBracNCdOfVsr";
-
 const flags = {
   playlist: "--playlist=",
   playlistName: "--name=",
@@ -58,4 +55,3 @@ function getPlaylistName() {
 }
 
 bootstap();
-// new Download(join(__dirname, "..", "downloads", "playlist01")).download(link);
