@@ -1,19 +1,7 @@
 import { ConvertFileService } from "./convert-file";
 import { DownloadFile } from "./download-file";
+import { Job, JobState } from "./types";
 import { StringUtil } from "./util";
-
-type JobState = "pending" | "processing" | "downloading" | "finished";
-
-export interface Job {
-  url: string;
-  state: JobState;
-  progress: number;
-  videoTitle: string;
-  logStatus: string;
-  destination: string;
-  convert(): void;
-  download(): void;
-}
 
 export class VideoToMp3Job implements Job {
   public url!: string;
@@ -36,10 +24,14 @@ export class VideoToMp3Job implements Job {
   }
 
   get logStatus() {
-    return `${this.state}\t[${StringUtil.truncate(
+    return `${this.state}\t|${"=".repeat(
+      Math.floor(this.progress * 10)
+    )}>${" ".repeat(10 - Math.floor(this.progress * 10))}| ${(
+      this.progress * 100
+    ).toFixed(0)}%\t[${StringUtil.truncate(
       this.videoTitle || this.videoId,
-      20
-    )}] >>>> ${(this.progress * 100).toFixed(0)}%`;
+      30
+    )}]`;
   }
 
   public async convert() {
@@ -49,7 +41,8 @@ export class VideoToMp3Job implements Job {
       "mp3"
     );
     if (!result.data.success) {
-      throw new Error("Convert failed");
+      this.state = 'failed'
+      return;
     }
     this.state = "processing";
     this.videoTitle = result.data.title;
@@ -60,7 +53,6 @@ export class VideoToMp3Job implements Job {
   public download() {
     this.state = "downloading";
     this.progress = 0;
-    this.downloadFileService.download(this.downloadUrl);
     this.downloadFileService.on("finished", () => {
       this.state = "finished";
       this.progress = 1;
@@ -68,6 +60,7 @@ export class VideoToMp3Job implements Job {
     this.downloadFileService.on("progress", (progress) => {
       this.progress = progress;
     });
+    this.downloadFileService.download(this.downloadUrl);
   }
 
   private checkProgress() {

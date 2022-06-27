@@ -3,18 +3,14 @@ import { VideoToMp3Job } from "./job";
 import { Manager } from "./manager";
 import { ExternalAPI } from "./util";
 
-type Options = {
-  maxConcurrency: number;
-};
-
 export class Downloader {
   private destination: string;
   private playlistUrl: string;
-  private options: Options;
+  private options: Downloader.Options;
 
   private manager: Manager;
 
-  constructor(playlistUrl: string, dest: string, options: Options) {
+  constructor(playlistUrl: string, dest: string, options: Downloader.Options) {
     this.destination = dest;
     this.playlistUrl = playlistUrl;
     this.options = options;
@@ -55,8 +51,14 @@ export class Downloader {
       if (this.manager.activeJobs.length === 0) {
         clearInterval(logInterval);
       }
-      console.clear()
+      console.clear();
       this.manager.logStatus();
-    }, 1000);
+    }, 500);
   }
+}
+
+export namespace Downloader {
+  export type Options = {
+    maxConcurrency: number;
+  };
 }
