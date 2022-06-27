@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
+  "engines": {
+    "node": ">=10.0.0"
+  },
   "scripts": {
     "start:one": "npx ts-node src/index.ts"
   },
