@@ -1,5 +1,5 @@
 import { Job } from "./types";
-import { Commom } from "./util";
+import { Commom, DownloaderUtil } from "./util";
 
 export class Manager {
   private jobs = new Map<string, Job>();
@@ -13,7 +13,7 @@ export class Manager {
   get activeJobs() {
     const running = [] as Job[];
     for (const job of this.jobs.values()) {
-      if (["finished", "failed"].includes(job.state)) {
+      if (!["finished", "failed"].includes(job.state)) {
         running.push(job);
       }
     }
@@ -30,10 +30,10 @@ export class Manager {
       index++;
       if (job.state === "pending") {
         job.convert();
-        await Commom.sleep(1000);
+        await Commom.sleep(800);
       }
       if (index % this.options.maxConcurrency === 0) {
-        await Commom.sleep(5000);
+        await Commom.sleep(7000);
       }
     }
   }
@@ -45,7 +45,11 @@ export class Manager {
   }
 
   logStatus() {
-    console.log(`STATUS\tTITLE\tPROGRESS`);
+    console.log(
+      DownloaderUtil.log("STATUS"),
+      "\t" + DownloaderUtil.log("TITLE", { truncLen: 30 }),
+      "\t" + DownloaderUtil.log("PROGRESS")
+    );
     this.jobs.forEach((job) => console.log(job.logStatus));
   }
 }

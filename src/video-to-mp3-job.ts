@@ -1,7 +1,6 @@
-import { ConvertFileService } from "./convert-file";
 import { DownloadFile } from "./download-file";
 import { Job, JobState } from "./types";
-import { StringUtil } from "./util";
+import { DownloaderUtil, ExternalAPI } from "./util";
 
 export class VideoToMp3Job implements Job {
   public url!: string;
@@ -12,7 +11,6 @@ export class VideoToMp3Job implements Job {
   private externalPID!: string;
   private downloadUrl!: string;
   public downloadFileService: DownloadFile;
-  private convertFileService = ConvertFileService;
 
   constructor(job: Partial<Job>) {
     Object.assign(this, job);
@@ -24,27 +22,22 @@ export class VideoToMp3Job implements Job {
   }
 
   get logStatus() {
-    return `${this.state}\t|${"=".repeat(
-      Math.floor(this.progress * 10)
-    )}>${" ".repeat(10 - Math.floor(this.progress * 10))}| ${(
-      this.progress * 100
-    ).toFixed(0)}%\t[${StringUtil.truncate(
-      this.videoTitle || this.videoId,
-      30
-    )}]`;
+    return (
+      DownloaderUtil.log(this.state) +
+      "\t" +
+      DownloaderUtil.log(this.videoTitle || this.videoId, { truncLen: 30 }) +
+      "\t" +
+      DownloaderUtil.makeProgressBar(this.progress)
+    );
   }
 
   public async convert() {
     this.state = "processing";
-    const result = await this.convertFileService.requestConversion(
-      this.url,
-      "mp3"
-    );
+    const result = await ExternalAPI.requestConversion(this.url, "mp3");
     if (!result.data.success) {
-      this.state = 'failed'
+      this.state = "failed";
       return;
     }
-    this.state = "processing";
     this.videoTitle = result.data.title;
     this.externalPID = result.data.id;
     this.checkProgress();
@@ -65,9 +58,7 @@ export class VideoToMp3Job implements Job {
 
   private checkProgress() {
     const interval = setInterval(async () => {
-      const result = await this.convertFileService.checkProgress(
-        this.externalPID
-      );
+      const result = await ExternalAPI.checkProgress(this.externalPID);
       this.progress = result.data.progress / 1000;
       if (result.data.success) {
         clearInterval(interval);

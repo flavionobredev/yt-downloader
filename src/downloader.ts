@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync } from "fs";
-import { VideoToMp3Job } from "./job";
+import { VideoToMp3Job } from "./video-to-mp3-job";
 import { Manager } from "./manager";
 import { ExternalAPI } from "./util";
 
