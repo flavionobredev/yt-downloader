@@ -1,5 +1,7 @@
 # YT Downloader!
 
+<img src="./docs/img/downloads.png" width="480px" alt="download de vídeos em mp3">
+
 Mais um projetinho saindo! Dessa vez é *um sistema de conversão e download de músicas a partir de uma playlist do YouTube*.
 
 Baixar músicas é uma atividade que executo semanalmente e sempre quis automatizar de alguma forma 💡
