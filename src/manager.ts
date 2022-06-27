@@ -20,8 +20,24 @@ export class Manager {
     return running;
   }
 
-  start() {
+  public start() {
     this.initBatchProcessing();
+    this.initBatchDownloading();
+  }
+
+  public addJob(key: string, job: Job) {
+    if (job.state !== "pending")
+      throw new Error("not possible add a started job");
+    this.jobs.set(key, job);
+  }
+
+  public logStatus() {
+    console.log(
+      DownloaderUtil.log("STATUS"),
+      "\t" + DownloaderUtil.log("TITLE", { truncLen: 30 }),
+      "\t" + DownloaderUtil.log("PROGRESS")
+    );
+    this.jobs.forEach((job) => console.log(job.logStatus));
   }
 
   private async initBatchProcessing() {
@@ -38,19 +54,25 @@ export class Manager {
     }
   }
 
-  addJob(key: string, job: Job) {
-    if (job.state !== "pending")
-      throw new Error("not possible add a started job");
-    this.jobs.set(key, job);
-  }
+  private async initBatchDownloading() {
+    const downloadInterval = setInterval(() => {
+      if (this.activeJobs.length === 0) {
+        clearInterval(downloadInterval);
+        return 
+      }
 
-  logStatus() {
-    console.log(
-      DownloaderUtil.log("STATUS"),
-      "\t" + DownloaderUtil.log("TITLE", { truncLen: 30 }),
-      "\t" + DownloaderUtil.log("PROGRESS")
-    );
-    this.jobs.forEach((job) => console.log(job.logStatus));
+      if (
+        this.activeJobs.filter((job) => job.state === "downloading").length >=
+        this.options.maxConcurrency
+      ) {
+        return;
+      }
+
+      const job = this.activeJobs.find(
+        (job) => job.state === "processing" && job.progress === 1
+      );
+      if (job) job.download();
+    }, 200);
   }
 }
 

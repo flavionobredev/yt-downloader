@@ -36,7 +36,7 @@ export class Downloader {
     }
 
     const videos = playlistInfo.videos as string[];
-    videos.slice(0, 3).forEach((video) =>
+    videos.slice(0, 9).forEach((video) =>
       this.manager.addJob(
         video,
         new VideoToMp3Job({

@@ -33,7 +33,7 @@ function getMaxConcurrency() {
   const concurrencyString = process.argv.find((arg) =>
     arg.startsWith(flags.maxConcurrency)
   );
-  return concurrencyString ? Number(concurrencyString.split("=")[1]) : 1;
+  return concurrencyString ? Number(concurrencyString.split("=")[1]) : 4;
 }
 
 function getPlaylistName() {

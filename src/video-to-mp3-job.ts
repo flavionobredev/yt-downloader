@@ -61,9 +61,10 @@ export class VideoToMp3Job implements Job {
       const result = await ExternalAPI.checkProgress(this.externalPID);
       this.progress = result.data.progress / 1000;
       if (result.data.success) {
-        clearInterval(interval);
         this.downloadUrl = result.data.download_url;
-        this.download();
+        this.progress = 1;
+        clearInterval(interval);
+        return 
       }
     }, 1000);
   }
