@@ -35,7 +35,7 @@ A aplicação irá converter e baixar o arquivo, que estará disponível na past
 | --- | --- | ----------- |
 | --playlist | *string* | Obrigatório. Link da playlist pública que deseja baixar.
 | --name | *string* | Opcional. Nome da pasta onde será salvo. (Default: "Playlist 25-06-2022-13-30-12")
-| --max-concurrency | *string* | Opcional. Máximo permitido para download simultaneos. (Default: 4)
+| --max-concurrency | *number* | Opcional. Máximo permitido para download simultaneos. (Default: 4)
 
 
 > Nota: a finalidade desse projeto é apenas para servir como uma solução rápida para um problema atual. Contudo, quem sabe, ele não evolui para uma cli em Go!? 😁
